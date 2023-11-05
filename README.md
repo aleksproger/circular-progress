@@ -110,7 +110,8 @@ extension CircularProgressStyle where Self == CustomCircularProgressStyle {
 ```
 
 #### Illustration of examples from Sources/Examples
-https://github.com/aleksproger/circular-progress/assets/45671572/f068858a-ba28-454d-addd-8ce1a0e4bd87
+https://github.com/aleksproger/circular-progress/assets/45671572/d331c110-fea4-4091-8a5d-3fb3b96587f9
+
 
 ## Requirements
 
