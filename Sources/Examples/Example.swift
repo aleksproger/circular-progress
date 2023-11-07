@@ -8,7 +8,7 @@ struct ExamplePreviews: PreviewProvider {
                 SimpleExampleView(lineWidth: 10)
                     .frame(square: 100)
                 
-                SimpleExampleView(lineWidth: 10)
+                RotatingExampleView(lineWidth: 10)
                     .accentColor(.purple)
                     .frame(square: 100)
             }
@@ -40,7 +40,19 @@ struct SimpleExampleView: View {
     var body: some View {
         CircularProgress(lineWidth: lineWidth, state: progress)
             .progressStyle(.simple)
-            .onTimer { progress += 0.34 }
+            .onTimer(1) { progress += 0.25 }
+    }
+}
+
+struct RotatingExampleView: View {
+    @State
+    var progress: Double = 0
+    let lineWidth: CGFloat
+    
+    var body: some View {
+        CircularProgress(lineWidth: lineWidth, state: progress)
+            .progressStyle(.rotating)
+            .onTimer(1) { progress += 0.25 }
     }
 }
 
@@ -111,7 +123,7 @@ struct CustomCircularProgressStyle: CircularProgressStyle {
             color: { state in
                 switch state {
                 case .finished: .pink
-                case .inProgress: .white }
+                case .inProgress: .green }
             }
         ) { state in
             switch state {
