@@ -5,8 +5,43 @@ import SwiftUI
 public struct CircularProgress<State: RawRepresentable, Content: View>: View where State.RawValue: BinaryFloatingPoint {
     let lineWidth: CGFloat
     let state: State
+    let fraction: ClosedRange<State.RawValue>
     let color: (State) -> Color
     let content: (State) -> Content
+    
+    /// Creates a `CircularProgress` with inner content and color provided in initializer.
+    /// The most generic initializer which simplifies creation of custom styles and gives much freedom to client code.
+    ///
+    /// - Parameters:
+    ///   - lineWidth: Width of the progress circle and exclamation or checkmark in case of `.progressStyle(.interactive)`.
+    ///   - state: Initial state of the circular progress.
+    ///   - fraction: Size of the loader indicator. In order to display the progress it usuallly depend on the progress state.
+    ///   - color: Closure that provides progress circle color based on the state.
+    ///   - content: Content that will be layouted inside of the progress circle based on the state. For example `.progressStyle(.interactive)` adds checkmark and exclamtion for `.succeeded/.failed` states.
+    ///
+    /// - Example:
+    ///  ```
+    /// CircularProgress(
+    ///     lineWidth: 20,
+    ///     state: 0.0,
+    ///     fraction:
+    ///     color: { _ in .accentColor },
+    ///     content: { _ in Text("Inner") }
+    /// )
+    ///  ```
+    public init(
+        lineWidth: CGFloat,
+        state: State,
+        fraction: ClosedRange<State.RawValue>,
+        color: @escaping (State) -> Color,
+        @ViewBuilder _ content: @escaping (State) -> Content
+    ) {
+        self.lineWidth = lineWidth
+        self.state = state
+        self.fraction = fraction
+        self.color = color
+        self.content = content
+    }
     
     /// Creates a `CircularProgress` with inner content and color provided in initializer.
     /// The most generic initializer which simplifies creation of custom styles and gives much freedom to client code.
@@ -32,11 +67,45 @@ public struct CircularProgress<State: RawRepresentable, Content: View>: View whe
         color: @escaping (State) -> Color,
         @ViewBuilder _ content: @escaping (State) -> Content
     ) {
-        self.lineWidth = lineWidth
-        self.state = state
-        self.color = color
-        self.content = content
+        self.init(
+            lineWidth: lineWidth,
+            state: state,
+            fraction: (0...state.rawValue),
+            color: color,
+            content
+        )
     }
+    
+    /// Creates a `CircularProgress` without any inner content and with color provided in initializer.
+    ///
+    /// - Parameters:
+    ///   - lineWidth: Width of the progress circle and exclamation or checkmark in case of `.progressStyle(.interactive)`.
+    ///   - state: Initial state of the circular progress.
+    ///   - fraction: Size of the loader indicator. In order to display the progress it usuallly depend on the progress state.
+    ///   - color: Closure that provides progress circle color based on the state.
+    /// - Example:
+    ///  ```
+    /// CircularProgress(
+    ///     lineWidth: 20,
+    ///     state: 0.0
+    ///     color: { _ in .accentColor }
+    /// )
+    ///  ```
+    public init(
+        lineWidth: CGFloat,
+        state: State,
+        fraction: ClosedRange<State.RawValue>,
+        color: @escaping (State) -> Color
+    ) where Content == EmptyView {
+        self.init(
+            lineWidth: lineWidth,
+            state: state,
+            fraction: fraction,
+            color: color,
+            { _ in EmptyView() }
+        )
+    }
+    
     
     /// Creates a `CircularProgress` without any inner content and with color provided in initializer.
     ///
@@ -57,11 +126,43 @@ public struct CircularProgress<State: RawRepresentable, Content: View>: View whe
         state: State,
         color: @escaping (State) -> Color
     ) where Content == EmptyView {
-        self.lineWidth = lineWidth
-        self.state = state
-        self.color = color
-        self.content = { _ in EmptyView() }
+        self.init(
+            lineWidth: lineWidth,
+            state: state,
+            fraction: 0...state.rawValue,
+            color: { _ in .accentColor },
+            { _ in EmptyView() }
+        )
     }
+    
+    /// Creates a `CircularProgress` without any inner content and with color provided in initializer.
+    ///
+    /// - Parameters:
+    ///   - lineWidth: Width of the progress circle and exclamation or checkmark in case of `.progressStyle(.interactive)`.
+    ///   - state: Initial state of the circular progress.
+    ///   - fraction: Size of the loader indicator. In order to display the progress it usuallly depend on the progress state.
+    /// - Example:
+    ///  ```
+    /// CircularProgress(
+    ///     lineWidth: 20,
+    ///     state: 0.0
+    ///     color: { _ in .accentColor }
+    /// )
+    ///  ```
+    public init(
+        lineWidth: CGFloat,
+        state: State,
+        fraction: @autoclosure () -> ClosedRange<State.RawValue>
+    ) where Content == EmptyView {
+        self.init(
+            lineWidth: lineWidth,
+            state: state,
+            fraction: fraction(),
+            color: { _ in .accentColor },
+            { _ in EmptyView() }
+        )
+    }
+
     
     /// Creates a `CircularProgress` without any inner content and with `.accentColor` color of the progress circle.
     /// Color of the circle can be changed usint `.tint(_ color:)` or `.accentColor(_ color:)` based on the OS version.
@@ -80,10 +181,13 @@ public struct CircularProgress<State: RawRepresentable, Content: View>: View whe
         lineWidth: CGFloat,
         state: State
     ) where Content == EmptyView {
-        self.lineWidth = lineWidth
-        self.state = state
-        self.color = { _ in .accentColor }
-        self.content = { _ in EmptyView() }
+        self.init(
+            lineWidth: lineWidth,
+            state: state,
+            fraction: 0...state.rawValue,
+            color: { _ in .accentColor },
+            { _ in EmptyView() }
+        )
     }
     
     public var body: some View {
@@ -93,9 +197,8 @@ public struct CircularProgress<State: RawRepresentable, Content: View>: View whe
                         .stroke(color(state).opacity(0.5), lineWidth: lineWidth)
                         .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
                     
-                    
                     Circle()
-                        .trim(from: 0, to: CGFloat(state.rawValue))
+                        .trim(from: CGFloat(fraction.lowerBound), to: CGFloat(fraction.upperBound))
                         .stroke(color(state), style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
                         .position(x: proxy.size.width / 2, y: proxy.size.height / 2)
                     
