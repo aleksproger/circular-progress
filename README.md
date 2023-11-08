@@ -125,5 +125,16 @@ https://github.com/aleksproger/circular-progress/assets/45671572/d331c110-fea4-4
 **SwiftPM:**
 
 ```swift
-.package(url: "https://github.com/aleksproger/circular-progress.git", .upToNextMajor(from: "1.0.0"))
+.package(url: "https://github.com/aleksproger/circular-progress.git", .upToNextMajor(from: "1.1.0"))
+```
+
+**Bazel:**
+
+```python
+git_repository(
+    name = "circular-progress",
+    branch = "1.1.0",
+    remote = "https://github.com/aleksproger/circular-progress.git",
+    repo_mapping = {},
+)
 ```
