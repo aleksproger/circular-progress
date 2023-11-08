@@ -50,6 +50,22 @@ struct InteractiveExampleView: View {
 }
 ```
 
+#### Circular progress with rotating style
+
+```swift
+struct RotatingExampleView: View {
+    @State
+    var progress: Double = 0
+    let lineWidth: CGFloat
+    
+    var body: some View {
+        CircularProgress(lineWidth: lineWidth, state: progress)
+            .progressStyle(.rotating)
+            .onTimer(1) { progress += 0.25 }
+    }
+}
+```
+
 #### Circular progress with custom style
 
 ```swift
@@ -110,7 +126,7 @@ extension CircularProgressStyle where Self == CustomCircularProgressStyle {
 ```
 
 #### Illustration of examples from Sources/Examples
-https://github.com/aleksproger/circular-progress/assets/45671572/d331c110-fea4-4091-8a5d-3fb3b96587f9
+https://github.com/aleksproger/circular-progress/assets/45671572/a27a3523-619a-4cb8-b88e-253e6360b706
 
 
 ## Requirements
@@ -122,13 +138,13 @@ https://github.com/aleksproger/circular-progress/assets/45671572/d331c110-fea4-4
 
 ## Installation
 
-**SwiftPM:**
+**SwiftPM**
 
 ```swift
 .package(url: "https://github.com/aleksproger/circular-progress.git", .upToNextMajor(from: "1.1.0"))
 ```
 
-**Bazel:**
+**Bazel**
 
 ```python
 git_repository(
