@@ -10,8 +10,8 @@ public protocol CircularProgressStyle {
 }
 
 public struct CircularProgressStyleConfiguration<State: RawRepresentable> where State.RawValue: BinaryFloatingPoint {
-    let lineWidth: CGFloat
-    let state: State
+    public let lineWidth: CGFloat
+    public let state: State
     
     public init(
         lineWidth: CGFloat,

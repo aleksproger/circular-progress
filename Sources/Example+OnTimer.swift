@@ -19,7 +19,7 @@ struct OnTimer: ViewModifier {
 
 /// Syntax sugar for `ViewModifier`, based on Apple recomendations.
 extension View {
-    func onTimer(
+    public func onTimer(
         _ interval: TimeInterval = 0.1,
         _ block: @escaping () -> Void
     ) -> some View {
